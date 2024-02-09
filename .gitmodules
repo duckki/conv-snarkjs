@@ -1,0 +1,3 @@
+[submodule "solidity-parser/grammar"]
+	path = extractor/grammar
+	url = https://github.com/solidity-parser/antlr.git
