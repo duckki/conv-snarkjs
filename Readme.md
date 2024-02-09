@@ -1,0 +1,62 @@
+# `snarkjs` verifier contract converter from Solidity to Python
+
+This tool converts an existing snarkjs-generated Solidity zk-SNARK verifier into an equivalent Python code that can be executed more conveniently within Python environment.
+
+## Setup
+
+### Prerequisites
+
+- Python3
+- pipenv
+
+### Installing Python dependencies
+
+Run the following command:
+```
+$ pipenv install
+```
+
+`py-ecc` and `antlr4-python3-runtime` packages are needed.
+
+
+## Usage
+
+```
+$ pipenv run python3 extractor/extractor.py <input.sol> <output.py>
+```
+
+`input.sol` must be a snarkjs-generated Solidity source file. Currently, Groth16 is supported.
+
+Try the included sample contract:
+```
+$ pipenv run python3 extractor/extractor.py extractor/tests/sample.sol output.py
+```
+
+## Output
+
+The Python output file will contain a very succint code that verifies groth16 proofs.
+
+Example:
+```python
+alpha = G1Point( 20491192805390485299153009773594534940189261866228447918068658471970481763042, 9383485363053290200918347156157836566562967994039712273449902621266178545958 )
+beta = G2Point( [ 4252822878758300859123897981450591353533073413197771768651442665752259397132, 6375614351688725206403948262868962793625744043794305715222011528459656738731 ]
+              , [ 21847035105528745403288232691147584728191162732299865338377159692350059136679, 10505242626370262277552901082094356697409835680220590971873171140371331206856 ] )
+gamma = G2Point( [ 11559732032986387107991004021392285783925812861821192530917403151452391805634, 10857046999023057135944570762232829481370756359578518086990519993285655852781 ]
+               , [ 4082367875863433681332203403145435568316851327593401208105741076214120093531, 8495653923123431417604973247489272438418190587263600148770280649306958101930 ] )
+delta = G2Point( [ 17096891768136499985262733314739463401483667921622994906401545195305800975495, 17439231704024250219075436644712307158019721615967763120340393268595545870567 ]
+               , [ 14242227101522867103124176999663903173398471163652444459509115469646714142182, 15092398166611519871664689356368494634061807894631742303838343043671627223964 ] )
+IC0 = G1Point( 6819801395408938350212900248749732364821477541620635511814266536599629892365, 9092252330033992554755034971584864587974280972948086568597554018278609861372 )
+IC1 = G1Point( 17882351432929302592725330552407222299541667716607588771282887857165175611387, 18907419617206324833977586007131055763810739835484972981819026406579664278293 )
+
+def verifyProof( A, B, C, pubSignals ) -> bool:
+    Vk = IC0 + IC1 * pubSignals[0]
+    return e(-A, B) * e(alpha, beta) * e(Vk, gamma) * e(C, delta) == GT_one
+```
+
+The output Python code also includes a simple REPL script that verifies user inputs intereactively. It can be executed as following:
+
+```
+$ pipenv run python3 <output.py>
+```
+
+If `py-ecc` package is installed in system-wide, the `<ouptut.py>` can be executed without running `pipenv`. However, the output Python code depends on the `snark` and `ethereum` subdirectories of this project. So, make sure they are included in the python module search paths.
